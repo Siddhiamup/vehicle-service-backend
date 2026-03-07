@@ -106,7 +106,6 @@
 //    }
 //}
 
-
 package com.smartvehicle.serviceportal.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,98 +128,74 @@ import com.smartvehicle.serviceportal.security.JwtFilter;
 @Configuration
 public class SecurityConfig {
 
-    @Autowired
-    private JwtFilter jwtFilter;
+	@Autowired
+	private JwtFilter jwtFilter;
 
-    // ============================================================
-    // PASSWORD ENCODER
-    // ============================================================
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	// ============================================================
+	// PASSWORD ENCODER
+	// ============================================================
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-    // ============================================================
-    // AUTHENTICATION MANAGER
-    // ============================================================
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
+	// ============================================================
+	// AUTHENTICATION MANAGER
+	// ============================================================
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 
-        return config.getAuthenticationManager();
-    }
+		return config.getAuthenticationManager();
+	}
 
-    // ============================================================
-    // SECURITY FILTER CHAIN (FIXED ORDER)
-    // ============================================================
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	// ============================================================
+	// SECURITY FILTER CHAIN (FIXED ORDER)
+	// ============================================================
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http
-            // Enable CORS (uses CorsConfig)
-            .cors(cors -> {})
+		http
+				// Enable CORS (uses CorsConfig)
+				.cors(cors -> {
+				})
 
-            // Disable CSRF (JWT based)
-            .csrf(csrf -> csrf.disable())
+				// Disable CSRF (JWT based)
+				.csrf(csrf -> csrf.disable())
 
-            // Stateless session
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
+				// Stateless session
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // ====================================================
-            // AUTHORIZATION RULES (ORDER MATTERS!)
-            // ====================================================
-            .authorizeHttpRequests(auth -> auth
+				// ====================================================
+				// AUTHORIZATION RULES (ORDER MATTERS!)
+				// ====================================================
+				.authorizeHttpRequests(auth -> auth
+						// Allow CORS preflight
+						.requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+						// ---------- PUBLIC ----------
+						.requestMatchers("/auth/login", "/auth/register", "/services/all").permitAll()
 
-                // ---------- PUBLIC ----------
-                .requestMatchers(
-                        "/auth/login",
-                        "/auth/register",
-                        "/services/all"
-                ).permitAll()
+						// ---------- CUSTOMER ----------
+						.requestMatchers("/vehicles/**", "/bookings/create/**", "/bookings/history/**",
+								"/bookings/cancel/**", "/invoices/view/**", "/invoices/download/**", "/invoices/my",
+								"/notifications/**")
+						.hasAuthority("ROLE_CUSTOMER")
 
-                // ---------- CUSTOMER ----------
-                .requestMatchers(
-                        "/vehicles/**",
-                        "/bookings/create/**",
-                        "/bookings/history/**",
-                        "/bookings/cancel/**",
-                        "/invoices/view/**",
-                        "/invoices/download/**",
-                        "/invoices/my",
-                        "/notifications/**"
-                ).hasAuthority("ROLE_CUSTOMER")
+						// ---------- SERVICE ADVISOR ----------
+						.requestMatchers("/bookings/updateStatus/**", "/bookings/dashboard/**", "/invoices/generate/**",
+								"/notifications/**")
+						.hasAuthority("ROLE_SERVICE_ADVISOR")
 
-                // ---------- SERVICE ADVISOR ----------
-                .requestMatchers(
-                        "/bookings/updateStatus/**",
-                        "/bookings/dashboard/**",
-                        "/invoices/generate/**",
-                        "/notifications/**"
-                ).hasAuthority("ROLE_SERVICE_ADVISOR")
+						// ---------- ADMIN ----------
+						.requestMatchers("/services/**", "/invoices/pay/**", "/invoices/all", "/notifications/**",
+								"/users/all", "/bookings/admin/**")
+						.hasAuthority("ROLE_ADMIN")
 
-                // ---------- ADMIN ----------
-                .requestMatchers(
-                        "/services/**",
-                        "/invoices/pay/**",
-                        "/invoices/all",
-                        "/notifications/**",
-                        "/users/all",
-                        "/bookings/admin/**"
-                ).hasAuthority("ROLE_ADMIN")
+						// ---------- FALLBACK (LAST LINE ONLY) ----------
+						.anyRequest().authenticated())
 
-                // ---------- FALLBACK (LAST LINE ONLY) ----------
-                .anyRequest().authenticated()
-            )
+				// JWT Filter
+				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-            // JWT Filter
-            .addFilterBefore(
-                    jwtFilter,
-                    UsernamePasswordAuthenticationFilter.class
-            );
-
-        return http.build();
-    }
+		return http.build();
+	}
 }
-

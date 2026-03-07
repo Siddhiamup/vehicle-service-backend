@@ -84,17 +84,10 @@ public class CorsConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        // ============================================================
-        // Allowed Frontend Origins
-        // ============================================================
-        config.setAllowedOrigins(List.of(
-                "http://localhost:5173",                    // local development
-                "https://vehicle-service-frontend.vercel.app" // production frontend
-        ));
+        // Allow frontend domains
+        config.setAllowedOriginPatterns(List.of("*"));
 
-        // ============================================================
-        // Allowed HTTP Methods
-        // ============================================================
+        // Allow all HTTP methods
         config.setAllowedMethods(List.of(
                 "GET",
                 "POST",
@@ -104,19 +97,12 @@ public class CorsConfig {
                 "OPTIONS"
         ));
 
-        // ============================================================
-        // Allowed Headers
-        // ============================================================
+        // Allow headers
         config.setAllowedHeaders(List.of("*"));
 
-        // ============================================================
-        // Allow Authorization Header (JWT)
-        // ============================================================
+        // Allow JWT Authorization header
         config.setAllowCredentials(true);
 
-        // ============================================================
-        // Apply to all routes
-        // ============================================================
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
 
