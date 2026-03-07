@@ -173,6 +173,7 @@ public class SecurityConfig {
 						.requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 						// ---------- PUBLIC ----------
 						.requestMatchers("/auth/login", "/auth/register", "/services/all").permitAll()
+						.requestMatchers("/notifications/**").authenticated()
 
 						// ---------- CUSTOMER ----------
 						.requestMatchers("/vehicles/**", "/bookings/create/**", "/bookings/history/**",
