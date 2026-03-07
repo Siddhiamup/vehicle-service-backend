@@ -16,43 +16,37 @@ import com.smartvehicle.serviceportal.service.UserService;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+	@Autowired
+	private JwtUtil jwtUtil;
 
-    // ============================================================
-    // REGISTER USER
-    // ============================================================
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+	// ============================================================
+	// REGISTER USER
+	// ============================================================
+	@PostMapping("/register")
+	public ResponseEntity<?> register(@RequestBody User user) {
 
-        // ❗ Password encoding is handled in service
-        return ResponseEntity.ok(
-                userService.saveUser(user)
-        );
-    }
+		// ❗ Password encoding is handled in service
+		return ResponseEntity.ok(userService.saveUser(user));
+	}
 
-    // ============================================================
-    // LOGIN → GENERATE JWT TOKEN
-    // ============================================================
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user) {
+	// ============================================================
+	// LOGIN → GENERATE JWT TOKEN
+	// ============================================================
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody User user) {
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        user.getEmail(),
-                        user.getPassword()
-                )
-        );
+		Authentication authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String token = jwtUtil.generateToken(userDetails);
+		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+		String token = jwtUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(token);
-    }
+		return ResponseEntity.ok(token);
+	}
 }

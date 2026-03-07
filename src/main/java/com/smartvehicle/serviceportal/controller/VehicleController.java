@@ -87,20 +87,14 @@ public class VehicleController {
 	// CUSTOMER → UPDATE VEHICLE
 	// ============================================================
 	@PutMapping("/update/{vehicleId}")
-	public ResponseEntity<?> updateVehicle(
-	        @PathVariable Long vehicleId,
-	        @RequestBody Vehicle vehicle) {
+	public ResponseEntity<?> updateVehicle(@PathVariable Long vehicleId, @RequestBody Vehicle vehicle) {
 
-	    Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-	    String email = auth.getName();
-	    User user = userService.findByEmail(email);
+		String email = auth.getName();
+		User user = userService.findByEmail(email);
 
-	    return ResponseEntity.ok(
-	            vehicleService.updateVehicle(vehicleId, vehicle, user)
-	    );
+		return ResponseEntity.ok(vehicleService.updateVehicle(vehicleId, vehicle, user));
 	}
 
 }

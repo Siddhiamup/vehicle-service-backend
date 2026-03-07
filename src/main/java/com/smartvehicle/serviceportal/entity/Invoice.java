@@ -10,15 +10,15 @@ import lombok.*;
 @Table(name = "invoices")
 public class Invoice {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long invoiceId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long invoiceId;
 
-    @OneToOne
-    @JoinColumn(name = "booking_id")
-    private Booking booking;
+	@OneToOne
+	@JoinColumn(name = "booking_id")
+	private Booking booking;
 
-    private Double amount;
+	private Double amount;
 
-    private String paymentStatus; // PENDING / PAID
+	private String paymentStatus; // PENDING / PAID
 }

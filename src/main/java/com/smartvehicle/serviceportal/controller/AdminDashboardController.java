@@ -15,27 +15,22 @@ import com.smartvehicle.serviceportal.service.UserService;
 @RequestMapping("/admin/dashboard")
 public class AdminDashboardController {
 
-    @Autowired
-    private AdminDashboardService adminDashboardService;
+	@Autowired
+	private AdminDashboardService adminDashboardService;
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    // ============================================================
-    // ADMIN → DASHBOARD STATS
-    // ============================================================
-    @GetMapping("/stats")
-    public ResponseEntity<?> getDashboardStats() {
+	// ============================================================
+	// ADMIN → DASHBOARD STATS
+	// ============================================================
+	@GetMapping("/stats")
+	public ResponseEntity<?> getDashboardStats() {
 
-        String email = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        User admin = userService.findByEmail(email);
+		User admin = userService.findByEmail(email);
 
-        return ResponseEntity.ok(
-                adminDashboardService.getDashboardStats(admin)
-        );
-    }
+		return ResponseEntity.ok(adminDashboardService.getDashboardStats(admin));
+	}
 }

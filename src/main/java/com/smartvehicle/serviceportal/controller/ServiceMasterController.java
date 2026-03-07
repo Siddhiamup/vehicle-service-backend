@@ -11,59 +11,47 @@ import com.smartvehicle.serviceportal.service.ServiceMasterService;
 @RequestMapping("/services")
 public class ServiceMasterController {
 
-    @Autowired
-    private ServiceMasterService serviceMasterService;
+	@Autowired
+	private ServiceMasterService serviceMasterService;
 
-    // ============================================================
-    // ADMIN → ADD SERVICE
-    // ============================================================
+	// ============================================================
+	// ADMIN → ADD SERVICE
+	// ============================================================
 
-    @PostMapping("/add")
-    public ResponseEntity<?> addService(
-            @RequestBody ServiceMaster serviceMaster) {
+	@PostMapping("/add")
+	public ResponseEntity<?> addService(@RequestBody ServiceMaster serviceMaster) {
 
-        return ResponseEntity.ok(
-                serviceMasterService.addService(serviceMaster)
-        );
-    }
+		return ResponseEntity.ok(serviceMasterService.addService(serviceMaster));
+	}
 
-    // ============================================================
-    // PUBLIC → VIEW ALL SERVICES
-    // ============================================================
+	// ============================================================
+	// PUBLIC → VIEW ALL SERVICES
+	// ============================================================
 
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllServices() {
-        return ResponseEntity.ok(
-                serviceMasterService.getAllServices()
-        );
-    }
+	@GetMapping("/all")
+	public ResponseEntity<?> getAllServices() {
+		return ResponseEntity.ok(serviceMasterService.getAllServices());
+	}
 
-    // ============================================================
-    // ADMIN → DELETE SERVICE (SAFE)
-    // ============================================================
+	// ============================================================
+	// ADMIN → DELETE SERVICE (SAFE)
+	// ============================================================
 
-    @DeleteMapping("/delete/{serviceId}")
-    public ResponseEntity<?> deleteService(
-            @PathVariable Long serviceId) {
+	@DeleteMapping("/delete/{serviceId}")
+	public ResponseEntity<?> deleteService(@PathVariable Long serviceId) {
 
-        try {
-            serviceMasterService.deleteService(serviceId);
-            return ResponseEntity.ok("Service deleted successfully");
+		try {
+			serviceMasterService.deleteService(serviceId);
+			return ResponseEntity.ok("Service deleted successfully");
 
-        } catch (RuntimeException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(e.getMessage());
-        }
-    }
-    
-    @PutMapping("/update/{serviceId}")
-    public ResponseEntity<?> updateService(
-            @PathVariable Long serviceId,
-            @RequestBody ServiceMaster serviceMaster) {
+		} catch (RuntimeException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
 
-        return ResponseEntity.ok(
-                serviceMasterService.updateService(serviceId, serviceMaster)
-        );
-    }
+	@PutMapping("/update/{serviceId}")
+	public ResponseEntity<?> updateService(@PathVariable Long serviceId, @RequestBody ServiceMaster serviceMaster) {
+
+		return ResponseEntity.ok(serviceMasterService.updateService(serviceId, serviceMaster));
+	}
 }

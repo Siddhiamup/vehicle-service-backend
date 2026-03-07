@@ -12,22 +12,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Vehicle {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long vehicleId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long vehicleId;
 
-    private String vehicleNumber;
+	private String vehicleNumber;
 
-    private String model;
+	private String model;
 
-    private String fuelType;
+	private String fuelType;
 
-    private int year;
+	private int year;
 
-    // ====================================================
-    // MANY VEHICLES → ONE USER
-    // ====================================================
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+	// ====================================================
+	// MANY VEHICLES → ONE USER
+	// ====================================================
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 }

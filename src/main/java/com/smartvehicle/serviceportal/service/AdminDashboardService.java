@@ -14,32 +14,31 @@ import com.smartvehicle.serviceportal.repository.UserRepository;
 @Service
 public class AdminDashboardService {
 
-    @Autowired
-    private UserRepository userRepo;
+	@Autowired
+	private UserRepository userRepo;
 
-    @Autowired
-    private BookingRepository bookingRepo;
+	@Autowired
+	private BookingRepository bookingRepo;
 
-    @Autowired
-    private InvoiceRepository invoiceRepo;
+	@Autowired
+	private InvoiceRepository invoiceRepo;
 
-    // ============================================================
-    // ADMIN → DASHBOARD STATS
-    // ============================================================
-    public Map<String, Object> getDashboardStats(User admin) {
+	// ============================================================
+	// ADMIN → DASHBOARD STATS
+	// ============================================================
+	public Map<String, Object> getDashboardStats(User admin) {
 
-        if (!"ADMIN".equals(admin.getRole())) {
-            throw new RuntimeException("Only admin can access dashboard stats");
-        }
+		if (!"ADMIN".equals(admin.getRole())) {
+			throw new RuntimeException("Only admin can access dashboard stats");
+		}
 
-        Map<String, Object> stats = new HashMap<>();
+		Map<String, Object> stats = new HashMap<>();
 
-        stats.put("totalUsers", userRepo.count());
-        stats.put("totalBookings", bookingRepo.count());
-        stats.put("totalRevenue", invoiceRepo.getTotalRevenue());
-        stats.put("pendingPayments",
-                invoiceRepo.countByPaymentStatus("PENDING"));
+		stats.put("totalUsers", userRepo.count());
+		stats.put("totalBookings", bookingRepo.count());
+		stats.put("totalRevenue", invoiceRepo.getTotalRevenue());
+		stats.put("pendingPayments", invoiceRepo.countByPaymentStatus("PENDING"));
 
-        return stats;
-    }
+		return stats;
+	}
 }

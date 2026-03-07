@@ -12,76 +12,70 @@ import com.smartvehicle.serviceportal.repository.VehicleRepository;
 @Service
 public class VehicleService {
 
-    @Autowired
-    private VehicleRepository vehicleRepo;
+	@Autowired
+	private VehicleRepository vehicleRepo;
 
-    // ====================================================
-    // ADD VEHICLE FOR LOGGED-IN CUSTOMER
-    // ====================================================
-    public Vehicle addVehicle(Vehicle vehicle, User user) {
+	// ====================================================
+	// ADD VEHICLE FOR LOGGED-IN CUSTOMER
+	// ====================================================
+	public Vehicle addVehicle(Vehicle vehicle, User user) {
 
-        // Link vehicle to customer
-        vehicle.setUser(user);
+		// Link vehicle to customer
+		vehicle.setUser(user);
 
-        return vehicleRepo.save(vehicle);
-    }
+		return vehicleRepo.save(vehicle);
+	}
 
-    // ====================================================
-    // GET VEHICLE BY ID (USED BY BOOKING)
-    // ====================================================
-    public Vehicle getById(Long vehicleId) {
+	// ====================================================
+	// GET VEHICLE BY ID (USED BY BOOKING)
+	// ====================================================
+	public Vehicle getById(Long vehicleId) {
 
-        return vehicleRepo.findById(vehicleId)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Vehicle not found with ID: " + vehicleId
-                        )
-                );
-    }
-    
- // ============================================================
- // GET VEHICLES FOR LOGGED-IN CUSTOMER
- // ============================================================
- public List<Vehicle> getVehiclesByUser(User user) {
+		return vehicleRepo.findById(vehicleId)
+				.orElseThrow(() -> new RuntimeException("Vehicle not found with ID: " + vehicleId));
+	}
 
-     return vehicleRepo.findByUser(user);
- }
+	// ============================================================
+	// GET VEHICLES FOR LOGGED-IN CUSTOMER
+	// ============================================================
+	public List<Vehicle> getVehiclesByUser(User user) {
 
- // ============================================================
- // DELETE VEHICLE
- // ============================================================
- public void deleteVehicle(Long vehicleId, User user) {
+		return vehicleRepo.findByUser(user);
+	}
 
-     Vehicle vehicle = vehicleRepo.findById(vehicleId)
-             .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+	// ============================================================
+	// DELETE VEHICLE
+	// ============================================================
+	public void deleteVehicle(Long vehicleId, User user) {
 
-     // Ownership validation
-     if (!vehicle.getUser().getUserId().equals(user.getUserId())) {
-         throw new RuntimeException("Unauthorized to delete this vehicle");
-     }
+		Vehicle vehicle = vehicleRepo.findById(vehicleId).orElseThrow(() -> new RuntimeException("Vehicle not found"));
 
-     vehicleRepo.delete(vehicle);
- }
+		// Ownership validation
+		if (!vehicle.getUser().getUserId().equals(user.getUserId())) {
+			throw new RuntimeException("Unauthorized to delete this vehicle");
+		}
 
- // ============================================================
- // UPDATE VEHICLE
- // ============================================================
- public Vehicle updateVehicle(Long vehicleId, Vehicle updatedVehicle, User user) {
+		vehicleRepo.delete(vehicle);
+	}
 
-     Vehicle vehicle = vehicleRepo.findById(vehicleId)
-             .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+	// ============================================================
+	// UPDATE VEHICLE
+	// ============================================================
+	public Vehicle updateVehicle(Long vehicleId, Vehicle updatedVehicle, User user) {
 
-     // Ownership validation
-     if (!vehicle.getUser().getUserId().equals(user.getUserId())) {
-         throw new RuntimeException("Unauthorized to update this vehicle");
-     }
+		Vehicle vehicle = vehicleRepo.findById(vehicleId).orElseThrow(() -> new RuntimeException("Vehicle not found"));
 
-     vehicle.setVehicleNumber(updatedVehicle.getVehicleNumber());
-     vehicle.setModel(updatedVehicle.getModel());
-     vehicle.setFuelType(updatedVehicle.getFuelType());
-     vehicle.setYear(updatedVehicle.getYear());
+		// Ownership validation
+		if (!vehicle.getUser().getUserId().equals(user.getUserId())) {
+			throw new RuntimeException("Unauthorized to update this vehicle");
+		}
 
-     return vehicleRepo.save(vehicle);
- }
+		vehicle.setVehicleNumber(updatedVehicle.getVehicleNumber());
+		vehicle.setModel(updatedVehicle.getModel());
+		vehicle.setFuelType(updatedVehicle.getFuelType());
+		vehicle.setYear(updatedVehicle.getYear());
+
+		return vehicleRepo.save(vehicle);
+	}
 
 }

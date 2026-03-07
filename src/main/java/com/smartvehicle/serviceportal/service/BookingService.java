@@ -121,8 +121,7 @@ public class BookingService {
 	public List<Booking> getBookingsForDate(LocalDate date) {
 		return bookingRepo.findByBookingDate(date);
 	}
-	
-	
+
 	// ============================================================
 	// Pagination
 	// ============================================================

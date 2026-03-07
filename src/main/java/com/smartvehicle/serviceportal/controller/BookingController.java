@@ -30,156 +30,118 @@ import com.smartvehicle.serviceportal.service.VehicleService;
 @RequestMapping("/bookings")
 public class BookingController {
 
-    @Autowired
-    private BookingService bookingService;
+	@Autowired
+	private BookingService bookingService;
 
-    @Autowired
-    private VehicleService vehicleService;
+	@Autowired
+	private VehicleService vehicleService;
 
-    @Autowired
-    private ServiceMasterService serviceMasterService;
+	@Autowired
+	private ServiceMasterService serviceMasterService;
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    // ============================================================
-    // CUSTOMER → CREATE BOOKING
-    // ============================================================
-    @PostMapping("/create/{vehicleId}/{serviceId}")
-    public ResponseEntity<?> createBooking(
-            @PathVariable Long vehicleId,
-            @PathVariable Long serviceId,
-            @RequestBody Booking booking) {
+	// ============================================================
+	// CUSTOMER → CREATE BOOKING
+	// ============================================================
+	@PostMapping("/create/{vehicleId}/{serviceId}")
+	public ResponseEntity<?> createBooking(@PathVariable Long vehicleId, @PathVariable Long serviceId,
+			@RequestBody Booking booking) {
 
-        // Fetch vehicle
-        Vehicle vehicle = vehicleService.getById(vehicleId);
+		// Fetch vehicle
+		Vehicle vehicle = vehicleService.getById(vehicleId);
 
-        // Fetch service
-        ServiceMaster service = serviceMasterService
-                .getAllServices()
-                .stream()
-                .filter(s -> s.getServiceId().equals(serviceId))
-                .findFirst()
-                .orElseThrow(() ->
-                        new RuntimeException("Service not found with ID: " + serviceId)
-                );
+		// Fetch service
+		ServiceMaster service = serviceMasterService.getAllServices().stream()
+				.filter(s -> s.getServiceId().equals(serviceId)).findFirst()
+				.orElseThrow(() -> new RuntimeException("Service not found with ID: " + serviceId));
 
-        // Attach relations
-        booking.setVehicle(vehicle);
-        booking.setService(service);
+		// Attach relations
+		booking.setVehicle(vehicle);
+		booking.setService(service);
 
-        return ResponseEntity.ok(
-                bookingService.createBooking(booking)
-        );
-    }
+		return ResponseEntity.ok(bookingService.createBooking(booking));
+	}
 
-    // ============================================================
-    // CUSTOMER → CANCEL BOOKING
-    // ============================================================
-    @PatchMapping("/cancel/{bookingId}")
-    public ResponseEntity<?> cancelBooking(@PathVariable Long bookingId) {
+	// ============================================================
+	// CUSTOMER → CANCEL BOOKING
+	// ============================================================
+	@PatchMapping("/cancel/{bookingId}")
+	public ResponseEntity<?> cancelBooking(@PathVariable Long bookingId) {
 
-        String email = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        User user = userService.findByEmail(email);
-        Booking booking = bookingService.getBookingById(bookingId);
+		User user = userService.findByEmail(email);
+		Booking booking = bookingService.getBookingById(bookingId);
 
-        // Ownership validation
-        if (!booking.getVehicle().getUser().getUserId()
-                .equals(user.getUserId())) {
+		// Ownership validation
+		if (!booking.getVehicle().getUser().getUserId().equals(user.getUserId())) {
 
-            return ResponseEntity.status(403)
-                    .body("You cannot cancel someone else's booking");
-        }
+			return ResponseEntity.status(403).body("You cannot cancel someone else's booking");
+		}
 
-        return ResponseEntity.ok(
-                bookingService.cancelBooking(bookingId)
-        );
-    }
+		return ResponseEntity.ok(bookingService.cancelBooking(bookingId));
+	}
 
-    // ============================================================
-    // SERVICE ADVISOR → UPDATE BOOKING STATUS
-    // ============================================================
-    @PatchMapping("/updateStatus/{bookingId}")
-    public ResponseEntity<?> updateStatus(
-            @PathVariable Long bookingId,
-            @RequestParam String status) {
+	// ============================================================
+	// SERVICE ADVISOR → UPDATE BOOKING STATUS
+	// ============================================================
+	@PatchMapping("/updateStatus/{bookingId}")
+	public ResponseEntity<?> updateStatus(@PathVariable Long bookingId, @RequestParam String status) {
 
-        String email = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        User advisor = userService.findByEmail(email);
+		User advisor = userService.findByEmail(email);
 
-        // ✅ IMPORTANT:
-        // role stored in DB = SERVICE_ADVISOR
-        // authority used by Spring = ROLE_SERVICE_ADVISOR
-        if (advisor == null || !"SERVICE_ADVISOR".equals(advisor.getRole())) {
-            return ResponseEntity.status(403)
-                    .body("Only service advisor can update booking status");
-        }
+		// ✅ IMPORTANT:
+		// role stored in DB = SERVICE_ADVISOR
+		// authority used by Spring = ROLE_SERVICE_ADVISOR
+		if (advisor == null || !"SERVICE_ADVISOR".equals(advisor.getRole())) {
+			return ResponseEntity.status(403).body("Only service advisor can update booking status");
+		}
 
-        return ResponseEntity.ok(
-                bookingService.updateStatus(bookingId, status)
-        );
-    }
+		return ResponseEntity.ok(bookingService.updateStatus(bookingId, status));
+	}
 
-    // ============================================================
-    // CUSTOMER → BOOKING HISTORY (BY VEHICLE)
-    // ============================================================
-    @GetMapping("/history/{vehicleId}")
-    public ResponseEntity<?> bookingHistory(@PathVariable Long vehicleId) {
+	// ============================================================
+	// CUSTOMER → BOOKING HISTORY (BY VEHICLE)
+	// ============================================================
+	@GetMapping("/history/{vehicleId}")
+	public ResponseEntity<?> bookingHistory(@PathVariable Long vehicleId) {
 
-        return ResponseEntity.ok(
-                bookingService.getBookingHistoryByVehicle(vehicleId)
-        );
-    }
+		return ResponseEntity.ok(bookingService.getBookingHistoryByVehicle(vehicleId));
+	}
 
-    // ============================================================
-    // SERVICE ADVISOR → DAILY BOOKINGS DASHBOARD
-    // ============================================================
-    @GetMapping("/dashboard/{date}")
-    public ResponseEntity<?> getDailyBookings(@PathVariable String date) {
+	// ============================================================
+	// SERVICE ADVISOR → DAILY BOOKINGS DASHBOARD
+	// ============================================================
+	@GetMapping("/dashboard/{date}")
+	public ResponseEntity<?> getDailyBookings(@PathVariable String date) {
 
-        String email = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        User advisor = userService.findByEmail(email);
+		User advisor = userService.findByEmail(email);
 
-        // Role check (NO ROLE_ PREFIX HERE)
-        if (!"SERVICE_ADVISOR".equals(advisor.getRole())) {
-            return ResponseEntity.status(403)
-                    .body("Only service advisor can access dashboard");
-        }
+		// Role check (NO ROLE_ PREFIX HERE)
+		if (!"SERVICE_ADVISOR".equals(advisor.getRole())) {
+			return ResponseEntity.status(403).body("Only service advisor can access dashboard");
+		}
 
-        return ResponseEntity.ok(
-                bookingService.getBookingsForDate(
-                        LocalDate.parse(date)
-                )
-        );
-    }
-    
-    
-    // ============================================================
-    // Create AdminBookingController for Pagination
-    // ============================================================
-    @GetMapping("/admin/all")
-    public ResponseEntity<?> getAllBookings(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(required = false) String search) {
+		return ResponseEntity.ok(bookingService.getBookingsForDate(LocalDate.parse(date)));
+	}
 
-        Pageable pageable = PageRequest.of(page, size);
+	// ============================================================
+	// Create AdminBookingController for Pagination
+	// ============================================================
+	@GetMapping("/admin/all")
+	public ResponseEntity<?> getAllBookings(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(required = false) String search) {
 
-        Page<Booking> bookings =
-                bookingService.getBookingsPaginated(search, pageable);
+		Pageable pageable = PageRequest.of(page, size);
 
-        return ResponseEntity.ok(bookings);
-    }
+		Page<Booking> bookings = bookingService.getBookingsPaginated(search, pageable);
+
+		return ResponseEntity.ok(bookings);
+	}
 }

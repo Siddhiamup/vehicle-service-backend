@@ -12,64 +12,58 @@ import com.smartvehicle.serviceportal.repository.ServiceRepository;
 @Service
 public class ServiceMasterService {
 
-    @Autowired
-    private ServiceRepository serviceRepo;
+	@Autowired
+	private ServiceRepository serviceRepo;
 
-    @Autowired
-    private BookingRepository bookingRepo;
+	@Autowired
+	private BookingRepository bookingRepo;
 
-    // ============================================================
-    // ADD SERVICE
-    // ============================================================
+	// ============================================================
+	// ADD SERVICE
+	// ============================================================
 
-    public ServiceMaster addService(ServiceMaster service) {
-        return serviceRepo.save(service);
-    }
+	public ServiceMaster addService(ServiceMaster service) {
+		return serviceRepo.save(service);
+	}
 
-    // ============================================================
-    // GET ALL SERVICES
-    // ============================================================
+	// ============================================================
+	// GET ALL SERVICES
+	// ============================================================
 
-    public List<ServiceMaster> getAllServices() {
-        return serviceRepo.findAll();
-    }
+	public List<ServiceMaster> getAllServices() {
+		return serviceRepo.findAll();
+	}
 
-    // ============================================================
-    // DELETE SERVICE (SAFE DELETE)
-    // ============================================================
+	// ============================================================
+	// DELETE SERVICE (SAFE DELETE)
+	// ============================================================
 
-    public void deleteService(Long serviceId) {
+	public void deleteService(Long serviceId) {
 
-        // ✅ Check service exists
-        ServiceMaster service = serviceRepo.findById(serviceId)
-                .orElseThrow(() ->
-                        new RuntimeException("Service not found")
-                );
+		// ✅ Check service exists
+		ServiceMaster service = serviceRepo.findById(serviceId)
+				.orElseThrow(() -> new RuntimeException("Service not found"));
 
-        // ❌ Prevent delete if used in bookings
-        boolean isUsed =
-                bookingRepo.existsByServiceServiceId(serviceId);
+		// ❌ Prevent delete if used in bookings
+		boolean isUsed = bookingRepo.existsByServiceServiceId(serviceId);
 
-        if (isUsed) {
-            throw new RuntimeException(
-                "Service cannot be deleted because it is already used in bookings"
-            );
-        }
+		if (isUsed) {
+			throw new RuntimeException("Service cannot be deleted because it is already used in bookings");
+		}
 
-        // ✅ Safe delete
-        serviceRepo.delete(service);
-    }
-    
-    public ServiceMaster updateService(Long serviceId, ServiceMaster updatedService) {
+		// ✅ Safe delete
+		serviceRepo.delete(service);
+	}
 
-        ServiceMaster existingService =
-                serviceRepo.findById(serviceId)
-                        .orElseThrow(() -> new RuntimeException("Service not found"));
+	public ServiceMaster updateService(Long serviceId, ServiceMaster updatedService) {
 
-        existingService.setServiceName(updatedService.getServiceName());
-        existingService.setPrice(updatedService.getPrice());
-        existingService.setDurationHours(updatedService.getDurationHours());
+		ServiceMaster existingService = serviceRepo.findById(serviceId)
+				.orElseThrow(() -> new RuntimeException("Service not found"));
 
-        return serviceRepo.save(existingService);
-    }
+		existingService.setServiceName(updatedService.getServiceName());
+		existingService.setPrice(updatedService.getPrice());
+		existingService.setDurationHours(updatedService.getDurationHours());
+
+		return serviceRepo.save(existingService);
+	}
 }
