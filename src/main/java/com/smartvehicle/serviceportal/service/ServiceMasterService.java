@@ -59,4 +59,17 @@ public class ServiceMasterService {
         // ✅ Safe delete
         serviceRepo.delete(service);
     }
+    
+    public ServiceMaster updateService(Long serviceId, ServiceMaster updatedService) {
+
+        ServiceMaster existingService =
+                serviceRepo.findById(serviceId)
+                        .orElseThrow(() -> new RuntimeException("Service not found"));
+
+        existingService.setServiceName(updatedService.getServiceName());
+        existingService.setPrice(updatedService.getPrice());
+        existingService.setDurationHours(updatedService.getDurationHours());
+
+        return serviceRepo.save(existingService);
+    }
 }

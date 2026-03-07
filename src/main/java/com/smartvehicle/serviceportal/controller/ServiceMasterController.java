@@ -56,4 +56,14 @@ public class ServiceMasterController {
                     .body(e.getMessage());
         }
     }
+    
+    @PutMapping("/update/{serviceId}")
+    public ResponseEntity<?> updateService(
+            @PathVariable Long serviceId,
+            @RequestBody ServiceMaster serviceMaster) {
+
+        return ResponseEntity.ok(
+                serviceMasterService.updateService(serviceId, serviceMaster)
+        );
+    }
 }
